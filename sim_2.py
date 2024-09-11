@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import time
 
 
-# 定义参数
+# config
 num_agents = 100  # number of agents
 k = 8 # number of neighbours each agent has
 T = 1500 # time of simulation
@@ -45,15 +45,15 @@ def main_sim(omega_s):
     u[:,0] = np.random.choice([-1, 1], size=num_agents)
     # g[:,0]
     for t in range(1,len_time_steps):
-        G_t = G(t * dt)  # 当前环境参数
-        dW = np.random.normal(0, np.sqrt(dt), num_agents)  # 高斯噪声项
+        G_t = G(t * dt)  # current enviromental factor
+        dW = np.random.normal(0, np.sqrt(dt), num_agents)  # Gaussian noise
     
         for i in range(num_agents):
             # Predictor step
             g_pred = g[i, t - 1] + drift(g[i, t - 1], G_t) * dt + noise_sigma * dW[i]
            
             # Corrector step
-            G_t_next = G((t + 1) * dt)  # 计算下一步的环境参数
+            G_t_next = G((t + 1) * dt)
             g[i, t] = g[i, t - 1] + 0.5 * (drift(g[i, t - 1], G_t) + drift(g_pred, G_t_next)) * dt + noise_sigma * dW[i]
             
             temp_e = np.exp(  4*omega_g * g[i, t] / (noise_sigma**2) )

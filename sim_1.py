@@ -15,28 +15,24 @@ import matplotlib.pyplot as plt
 import time
 
 
-# 定义参数
-num_agents = 100  # 代理的数量
-k = 8
-T = 1500
-dt = 0.5  # 时间步长
-omega_g = 0.1  # 控制收敛速度的参数
-noise_sigma = 1.0  # 随机噪声的强度 sigma
+# config
+num_agents = 100  # number of agents
+k = 8 # number of neighbours each agent has
+T = 1500 # time of simulation
+dt = 1.0  # time step
+omega_g = 0.1
+noise_sigma = 1.0  # sigma, amplitude of noise
 
 omega_s = 0.57
 
 def G(t, half_period=250, high_value=1.0, low_value=-1.0):
-    # 计算当前时间点位于哪个半周期，并返回对应的高值或低值
     return np.where((t % (2 * half_period)) < half_period, high_value, low_value)
-# 定义环境参数G(t)的形式，这里以简单的周期性变化为例
-#def G(t):
-#    return np.sin(0.1 * t)  # 可以根据需要定义更复杂的函数
 
-# 初始化代理的估计g_i(t)，假设初始估计均为0
-len_time_steps = int(T/dt)  # 时间步数
-g = np.zeros((num_agents, len_time_steps)) # personal estimates
+
+len_time_steps = int(T/dt)  # number of time steps
+g = np.zeros((num_agents, len_time_steps))  # personal estimates
 time_steps = np.arange(len_time_steps) * dt
-u = np.zeros((num_agents, len_time_steps)) # actions
+u = np.zeros((num_agents, len_time_steps))  # actions
 acc = np.zeros((num_agents, len_time_steps-1))
 
 # 定义漂移项f
@@ -48,15 +44,15 @@ tic = time.time()
 u[:,0] = np.random.choice([-1, 1], size=num_agents)
 # g[:,0]
 for t in range(1,len_time_steps):
-    G_t = G(t * dt)  # 当前环境参数
-    dW = np.random.normal(0, np.sqrt(dt), num_agents)  # 高斯噪声项
+    G_t = G(t * dt)  # current enviromental factor
+    dW = np.random.normal(0, np.sqrt(dt), num_agents)  # Gaussian noise
 
     for i in range(num_agents):
         # Predictor step
         g_pred = g[i, t - 1] + drift(g[i, t - 1], G_t) * dt + noise_sigma * dW[i]
        
         # Corrector step
-        G_t_next = G((t + 1) * dt)  # 计算下一步的环境参数
+        G_t_next = G((t + 1) * dt)
         g[i, t] = g[i, t - 1] + 0.5 * (drift(g[i, t - 1], G_t) + drift(g_pred, G_t_next)) * dt + noise_sigma * dW[i]
         
         temp_e = np.exp(  4*omega_g * g[i, t] / (noise_sigma**2) )
@@ -75,7 +71,7 @@ toc = time.time() - tic
 print(f"= run time {toc:.2f}s")      
 
 
-# 绘制结果
+# plot the results
 plt.figure(figsize=(10, 6))
 for i in range(num_agents):
     plt.plot(time_steps, g[i, :], label=f'Agent {i+1}')
