@@ -35,7 +35,6 @@ time_steps = np.arange(len_time_steps) * dt
 u = np.zeros((num_agents, len_time_steps))  # actions
 acc = np.zeros((num_agents, len_time_steps-1))
 
-# 定义漂移项f
 def drift(g_i, G_t):
     return -omega_g * (g_i - G_t)
 
