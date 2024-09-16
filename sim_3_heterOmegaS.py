@@ -28,7 +28,7 @@ omega_g = 0.1
 noise_sigma = 1.0  # sigma, amplitude of noise
 
 
-std_omega_s = 0.2
+std_omega_s = 0.2 # diversity in omega_s
 para_set = np.arange(0.5, 0.60 + 0.01, 0.01) # range of omega s to sweep
 repeat_num = 10 # number of repeating the simulation
 
@@ -67,12 +67,14 @@ def main_sim(avg_omega_s,std_omega_s):
             
             #sum_n_u = np.sum( u[:,t] ) - u[i,t] # fully connected    
             available_indices = np.delete(np.arange(num_agents), i)
-            selected_indices = np.random.choice(available_indices, size=k, replace=False)
-            sum_n_u = np.sum(u[selected_indices, t - 1])
+            selected_indices = np.random.choice(available_indices, size=k, replace=False) # neighbours           
             
             omega_s = omega_s_set[i]
             
+            # Bayesian update to have agent i's final decision at time step t
+            sum_n_u = np.sum(u[selected_indices, t - 1])            
             u[i,t] = np.sign(-1 + temp_e* (omega_s/(1-omega_s))**sum_n_u)
+            
             acc[i,t-1] = 1.0 - np.abs(G_t - u[i,t])/2.0
     
     average_u = np.average(u,axis=0)
@@ -174,6 +176,19 @@ result_std01 = np.array([[ 0.61386791, 26.12      ,  0.76820557],
        [ 0.79232422, 15.42      ,  0.35766519],
        [ 0.82412141, 22.38      ,  0.25402518]])
 
+
+result_std02 = np.array([[ 0.58097732, 35.66666667,  0.82925894],
+       [ 0.58678786, 28.11      ,  0.81924837],
+       [ 0.58878319, 30.44333333,  0.8153354 ],
+       [ 0.60568179, 19.82      ,  0.77884073],
+       [ 0.61616144, 28.23666667,  0.75750574],
+       [ 0.62183122, 23.07666667,  0.74500131],
+       [ 0.63653169, 15.46333333,  0.71349978],
+       [ 0.63181788, 13.12333333,  0.72445649],
+       [ 0.64579987, 11.59333333,  0.6973072 ],
+       [ 0.67584656, 10.12      ,  0.62855899],
+       [ 0.70058105, 10.86      ,  0.57261088]])
+
 plot_mkr_size = 10
 
 plt.figure(figsize=(10, 6))
@@ -181,7 +196,8 @@ plt.plot(para_set, result_std0[:,0], 'o-', label='std 0.000', markersize=plot_mk
 plt.plot(para_set, result_std00125[:,0], '^-', label='std 0.0125', markersize=plot_mkr_size)
 plt.plot(para_set, result_std0025[:,0], '+-', label='std 0.025', markersize=plot_mkr_size)
 plt.plot(para_set, result_std005[:,0], 'x-', label='std 0.05', markersize=plot_mkr_size)
-plt.plot(para_set, result_std01[:,0], 'v-', label='std 0.1', markersize=plot_mkr_size)
+plt.plot(para_set, result_std01[:,0], 's-', label='std 0.1', markersize=plot_mkr_size)
+plt.plot(para_set, result_std02[:,0], 'v-', label='std 0.2', markersize=plot_mkr_size)
 plt.xlabel('average omega s')
 plt.ylabel('accuracy')
 plt.xlim(0.498, 0.602)
@@ -195,7 +211,8 @@ plt.plot(para_set, result_std0[:,1], 'o-', label='std 0.000', markersize=plot_mk
 plt.plot(para_set, result_std00125[:,1], '^-', label='std 0.0125', markersize=plot_mkr_size)
 plt.plot(para_set, result_std0025[:,1], '+-', label='std 0.025', markersize=plot_mkr_size)
 plt.plot(para_set, result_std005[:,1], 'x-', label='std 0.05', markersize=plot_mkr_size)
-plt.plot(para_set, result_std01[:,1], 'v-', label='std 0.1', markersize=plot_mkr_size)
+plt.plot(para_set, result_std01[:,1], 's-', label='std 0.1', markersize=plot_mkr_size)
+plt.plot(para_set, result_std02[:,1], 'v-', label='std 0.2', markersize=plot_mkr_size)
 plt.xlabel('average omega s')
 plt.ylabel('average lag in flippings')
 plt.xlim(0.498, 0.602)
@@ -209,7 +226,8 @@ plt.plot(para_set, result_std0[:,2], 'o-', label='std 0.000', markersize=plot_mk
 plt.plot(para_set, result_std00125[:,2], '^-', label='std 0.0125', markersize=plot_mkr_size)
 plt.plot(para_set, result_std0025[:,2], '+-', label='std 0.025', markersize=plot_mkr_size)
 plt.plot(para_set, result_std005[:,2], 'x-', label='std 0.05', markersize=plot_mkr_size)
-plt.plot(para_set, result_std01[:,2], 'v-', label='std 0.1', markersize=plot_mkr_size)
+plt.plot(para_set, result_std01[:,2], 's-', label='std 0.1', markersize=plot_mkr_size)
+plt.plot(para_set, result_std02[:,2], 'v-', label='std 0.2', markersize=plot_mkr_size)
 plt.xlabel('average omega s')
 plt.ylabel('average minority error')
 plt.xlim(0.498, 0.602)
